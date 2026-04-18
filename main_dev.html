@@ -61,6 +61,24 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            /* Hide content until enter is clicked */
+        }
+
+        .content-hidden {
+            display: none !important;
+        }
+
+        .content-card {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .content-card.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
         /* ============================================ */
@@ -282,15 +300,90 @@
         }
 
         .bio {
-            font-size: 14px;
+            font-size: 13.5px;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
             margin-top: 10px;
-            max-width: 320px;
+            max-width: 360px;
+            font-style: italic;
+            position: relative;
+            padding: 0 20px;
         }
 
-        .bio span {
+        .bio::before, .bio::after {
+            content: '"';
+            font-size: 24px;
+            position: absolute;
+            color: var(--accent-primary);
+            opacity: 0.4;
+            font-family: serif;
+        }
+
+        .bio::before { left: -5px; top: -5px; }
+        .bio::after { right: -5px; bottom: -15px; }
+
+        /* ============================================ */
+        /*  STATS GRID                                  */
+        /* ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        .stats-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stats-header {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stats-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            transition: all var(--transition-fast);
+        }
+
+        .stats-item:hover {
+            background: rgba(112, 71, 235, 0.04);
+            border-color: rgba(112, 71, 235, 0.1);
+            transform: translateX(4px);
+        }
+
+        .stat-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-size: 11px;
+            font-family: var(--font-mono);
             color: var(--accent-secondary);
+        }
+
+        .stat-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
         /* ============================================ */
@@ -888,33 +981,78 @@
         }
 
         /* ============================================ */
-        /*  TOOLTIP                                     */
+        /*  LANDING PAGE (CLICK TO ENTER)               */
         /* ============================================ */
-        .tooltip {
-            position: relative;
+        .entry-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
         }
 
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0.8);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            white-space: nowrap;
-            pointer-events: none;
+        .entry-overlay.fade-out {
             opacity: 0;
-            transition: all var(--transition-fast);
-            border: 1px solid var(--border-subtle);
+            pointer-events: none;
+            visibility: hidden;
+            transform: scale(1.1);
         }
 
-        .tooltip:hover::after {
-            opacity: 1;
-            transform: translateX(-50%) scale(1);
+        .entry-content {
+            text-align: center;
+            animation: pulseText 3s ease-in-out infinite;
+        }
+
+        .entry-text {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 20px;
+        }
+
+        .entry-quote {
+            max-width: 300px;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 40px;
+            font-style: italic;
+            line-height: 1.6;
+            opacity: 0.6;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.4; transform: scale(0.98); }
+            50% { opacity: 0.8; transform: scale(1); }
+        }
+
+        .loading-bar {
+            width: 120px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin-top: 24px;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-primary);
+            animation: loadingProgress 3s infinite linear;
+        }
+
+        @keyframes loadingProgress {
+            to { left: 100%; }
         }
     </style>
 </head>
@@ -953,7 +1091,56 @@
                 </div>
                 <h1 class="username">ext_000</h1>
                 <p class="user-tag">@ext_000</p>
-                <!-- Tags removed by request -->
+                <div class="bio">
+                    The bible says, "Love never fails so if it fails, it was never love"
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid fade-in delay-2">
+                <!-- Coding Mastery -->
+                <div class="stats-col">
+                    <div class="stats-header">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+                        Coding
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">Lua <span class="stat-val">Master</span></div>
+                        <div class="stat-desc">3 Years • 85% Mastery</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">C++ <span class="stat-val">Intermediate</span></div>
+                        <div class="stat-desc">9 Months Experience</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">HTML <span class="stat-val">Advanced</span></div>
+                        <div class="stat-desc">2 Months • 75% Skill</div>
+                    </div>
+                </div>
+
+                <!-- Gaming Legacy -->
+                <div class="stats-col">
+                    <div class="stats-header">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m7-2h.01m2.99 0h.01"/></svg>
+                        Gaming
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">Roblox <span class="stat-val">19.7k</span></div>
+                        <div class="stat-desc">782 Hours Recorded</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">Fortnite <span class="stat-val">6.2k</span></div>
+                        <div class="stat-desc">281 Hours Gameplay</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">Rust <span class="stat-val">3.2k</span></div>
+                        <div class="stat-desc">261 Hours Total</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stat-name">CS2 <span class="stat-val">2.1k</span></div>
+                        <div class="stat-desc">172 Hours Legacy</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Spotify Now Playing -->
@@ -1076,28 +1263,87 @@
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" aria-label="Volume">
     </div>
 
-    <!-- Background Audio (lo-fi chill) -->
+    <!-- Background Audio -->
     <audio id="bgMusic" loop preload="auto">
-        <!-- User specified: Futile Devices -->
         <source src="assets/music.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="audio-overlay" style="position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.85); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(10px);">
-        <div style="padding:40px; border-radius:30px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); text-align:center; transform:translateY(-20px);">
-            <div style="width:80px; height:80px; margin:0 auto 20px; border-radius:50%; background:var(--accent-primary); display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px rgba(112, 71, 235, 0.4);">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-            <h2 style="font-size:24px; font-weight:700; color:white; margin-bottom:10px;">Click to Enter</h2>
-            <p style="font-size:14px; color:var(--text-secondary);">Listening to Futile Devices</p>
+    <!-- Entry UI -->
+    <div class="entry-overlay" id="entryOverlay">
+        <div class="entry-content">
+            <div class="entry-text">Enter The Void</div>
+            <div class="loading-bar"></div>
+            <div class="entry-quote">"The bible says, love never fails..."</div>
         </div>
     </div>
 
     <script>
-        /* ============================================ */
-        /*  PARTICLES SYSTEM                            */
-        /* ============================================ */
-        (function initParticles() {
-            const canvas = document.getElementById('particles-canvas');
+        // DOM Elements
+        const elements = {
+            particles: document.getElementById('particles-canvas'),
+            cursorGlow: document.getElementById('cursorGlow'),
+            clock: document.getElementById('clock'),
+            viewCount: document.getElementById('viewCount'),
+            statusDot: document.querySelector('.status-dot'),
+            spotifySection: document.getElementById('spotifySection'),
+            spotifySong: document.getElementById('spotifySong'),
+            spotifyArtist: document.getElementById('spotifyArtist'),
+            albumArt: document.getElementById('albumArt'),
+            spotifyProgress: document.getElementById('spotifyProgress'),
+            activitySection: document.getElementById('activitySection'),
+            activityName: document.getElementById('activityName'),
+            activityDetail: document.getElementById('activityDetail'),
+            activityIcon: document.querySelector('.activity-icon'),
+            bgMusic: document.getElementById('bgMusic'),
+            musicToggle: document.getElementById('musicToggle'),
+            playIcon: document.getElementById('playIcon'),
+            pauseIcon: document.getElementById('pauseIcon'),
+            volumeSlider: document.getElementById('volumeSlider'),
+            musicTitle: document.querySelector('.music-title'),
+            musicArtistLabel: document.querySelector('.music-artist-label'),
+            entryOverlay: document.getElementById('entryOverlay'),
+            mainCard: document.getElementById('mainCard')
+        };
+
+        const USER_ID = '1449413311035736116';
+
+        // Initialize Everything
+        function init() {
+            initParticles();
+            initCursorGlow();
+            initClock();
+            initLanyard();
+            initMusicPlayer();
+            initEntrySequence();
+            initVisitorCounter();
+            initTiltEffect();
+            
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        // 1. Entry Sequence
+        function initEntrySequence() {
+            elements.entryOverlay.addEventListener('click', () => {
+                // Play music
+                elements.bgMusic.play().then(() => {
+                    isPlaying = true;
+                    updateMusicUI();
+                }).catch(e => console.log("Autoplay blocked:", e));
+
+                // Animate UI
+                elements.entryOverlay.classList.add('fade-out');
+                elements.mainCard.classList.add('show');
+                
+                setTimeout(() => {
+                    elements.entryOverlay.remove();
+                }, 1200);
+            });
+        }
+
+        // 2. Particles Effect
+        function initParticles() {
+            const canvas = elements.particles;
             const ctx = canvas.getContext('2d');
             let particles = [];
             let mouse = { x: -999, y: -999 };
@@ -1110,10 +1356,7 @@
             window.addEventListener('resize', resize);
 
             class Particle {
-                constructor() {
-                    this.reset();
-                }
-
+                constructor() { this.reset(); }
                 reset() {
                     this.x = Math.random() * canvas.width;
                     this.y = Math.random() * canvas.height;
@@ -1121,54 +1364,43 @@
                     this.speedX = (Math.random() - 0.5) * 0.15;
                     this.speedY = (Math.random() - 0.5) * 0.15;
                     this.opacity = Math.random() * 0.15 + 0.03;
-                    this.hue = Math.random() > 0.7 ? 265 : 270; // deep purple only
+                    this.hue = Math.random() > 0.7 ? 265 : 270;
                 }
-
                 update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-
-                    // Mouse interaction
+                    this.x += this.speedX; this.y += this.speedY;
                     const dx = mouse.x - this.x;
                     const dy = mouse.y - this.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120) {
-                        this.x -= dx * 0.005;
-                        this.y -= dy * 0.005;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    if(distance < 120) {
+                        this.x -= dx * 0.005; this.y -= dy * 0.005;
                         this.opacity = Math.min(this.opacity + 0.01, 0.3);
                     }
-
-                    // Wrap
-                    if (this.x < 0) this.x = canvas.width;
-                    if (this.x > canvas.width) this.x = 0;
-                    if (this.y < 0) this.y = canvas.height;
-                    if (this.y > canvas.height) this.y = 0;
+                    if(this.x < 0) this.x = canvas.width;
+                    if(this.x > canvas.width) this.x = 0;
+                    if(this.y < 0) this.y = canvas.height;
+                    if(this.y > canvas.height) this.y = 0;
                 }
-
                 draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `hsla(${this.hue}, 30%, 40%, ${this.opacity})`;
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fillStyle = `hsla(${this.hue}, 30%, 40%, ${this.opacity})`; ctx.fill();
                 }
             }
 
-            // Create particles
             const count = Math.min(50, Math.floor(window.innerWidth * window.innerHeight / 25000));
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle());
-            }
+            for(let i=0; i<count; i++) particles.push(new Particle());
 
-            // Draw connections
-            function drawConnections() {
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                // Draw lines
+                for(let i=0; i<particles.length; i++) {
+                    for(let j=i+1; j<particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
                         const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if(dist < 120) {
                             ctx.beginPath();
-                            ctx.strokeStyle = `rgba(100, 60, 220, ${0.025 * (1 - dist / 120)})`;
+                            ctx.strokeStyle = `rgba(100,60,220, ${0.025 * (1 - dist/120)})`;
                             ctx.lineWidth = 0.5;
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
@@ -1176,239 +1408,124 @@
                         }
                     }
                 }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.update();
-                    p.draw();
-                });
-                drawConnections();
                 requestAnimationFrame(animate);
             }
             animate();
+            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        }
 
-            document.addEventListener('mousemove', e => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
+        // 3. Cursor Glow
+        function initCursorGlow() {
+            let active = false;
+            window.addEventListener('mousemove', e => {
+                if(!active) { elements.cursorGlow.style.opacity = '1'; active = true; }
+                elements.cursorGlow.style.left = `${e.clientX}px`;
+                elements.cursorGlow.style.top = `${e.clientY}px`;
             });
-        })();
-
-        /* ============================================ */
-        /*  CURSOR GLOW                                 */
-        /* ============================================ */
-        (function initCursorGlow() {
-            const glow = document.getElementById('cursorGlow');
-            let visible = false;
-
-            document.addEventListener('mousemove', e => {
-                if (!visible) {
-                    glow.style.opacity = '1';
-                    visible = true;
-                }
-                glow.style.left = e.clientX + 'px';
-                glow.style.top = e.clientY + 'px';
+            window.addEventListener('mouseleave', () => {
+                elements.cursorGlow.style.opacity = '0';
+                active = false;
             });
+        }
 
-            document.addEventListener('mouseleave', () => {
-                glow.style.opacity = '0';
-                visible = false;
-            });
-        })();
-
-        /* ============================================ */
-        /*  CLOCK                                       */
-        /* ============================================ */
-        (function initClock() {
-            const el = document.getElementById('clock');
-            function tick() {
+        // 4. Clock
+        function initClock() {
+            function update() {
                 const now = new Date();
-                el.textContent = now.toLocaleTimeString('en-US', {
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                elements.clock.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
-            tick();
-            setInterval(tick, 1000);
-        })();
+            update(); setInterval(update, 1000);
+        }
 
-        /* Typing effect removed — bio removed */
-
-        /* ============================================ */
-        /*  SPOTIFY NOW PLAYING (SIMULATED)             */
-        /*  Replace with real Spotify API if desired    */
-        /* ============================================ */
-        /* ============================================ */
-        /*  LANYARD API INTEGRATION                     */
-        /* ============================================ */
-        (function initLanyard() {
-            const DISCORD_ID = '1449413311035736116';
-            const statusDot = document.querySelector('.status-dot');
-            const spotifySection = document.getElementById('spotifySection');
-            const spotifySong = document.getElementById('spotifySong');
-            const spotifyArtist = document.getElementById('spotifyArtist');
-            const albumArt = document.getElementById('albumArt');
-            const spotifyProgress = document.getElementById('spotifyProgress');
-            
-            const activitySection = document.getElementById('activitySection');
-            const activityName = document.getElementById('activityName');
-            const activityDetail = document.getElementById('activityDetail');
-            const activityIcon = document.querySelector('.activity-icon');
-
-            function updatePresence() {
-                fetch(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`)
+        // 5. Lanyard API
+        function initLanyard() {
+            function update() {
+                fetch(`https://api.lanyard.rest/v1/users/${USER_ID}`)
                     .then(res => res.json())
                     .then(data => {
-                        if (!data.success) return;
-                        const presence = data.data;
+                        if(!data.success) return;
+                        const p = data.data;
+                        const colors = { online: '#1aa34a', idle: '#f1c40f', dnd: '#e74c3c', offline: '#3a3648' };
+                        elements.statusDot.style.background = colors[p.discord_status] || colors.offline;
+                        elements.statusDot.setAttribute('data-tooltip', p.discord_status.toUpperCase());
 
-                        // Update Status Dot
-                        const statusColors = {
-                            online: '#1aa34a',
-                            idle: '#f1c40f',
-                            dnd: '#e74c3c',
-                            offline: '#3a3648'
-                        };
-                        statusDot.style.background = statusColors[presence.discord_status] || statusColors.offline;
-                        statusDot.setAttribute('data-tooltip', presence.discord_status.toUpperCase());
-
-                        // Update Spotify
-                        if (presence.listening_to_spotify && presence.spotify) {
-                            spotifySection.style.display = 'flex';
-                            spotifySong.textContent = presence.spotify.track;
-                            spotifyArtist.textContent = presence.spotify.artist;
-                            albumArt.innerHTML = `<img src="${presence.spotify.album_art_url}" alt="Album Art">`;
+                        // Spotify Sync
+                        if(p.listening_to_spotify && p.spotify) {
+                            elements.spotifySection.style.display = 'flex';
+                            elements.spotifySong.textContent = p.spotify.track;
+                            elements.spotifyArtist.textContent = p.spotify.artist;
+                            elements.albumArt.innerHTML = `<img src="${p.spotify.album_art_url}" alt="Album Art">`;
+                            const start = p.spotify.timestamps.start;
+                            const end = p.spotify.timestamps.end;
+                            const progress = Math.min(100, Math.max(0, ((Date.now() - start) / (end - start)) * 100));
+                            elements.spotifyProgress.style.width = `${progress}%`;
                             
-                            // Progress bar
-                            const start = presence.spotify.timestamps.start;
-                            const end = presence.spotify.timestamps.end;
-                            const now = Date.now();
-                            const progress = Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
-                            spotifyProgress.style.width = `${progress}%`;
-
-                            // Sync Bottom Music Player
-                            if (window.updateMusicPlayerMetadata) {
-                                window.updateMusicPlayerMetadata(presence.spotify.track, presence.spotify.artist);
-                            }
+                            // Update music player metadata if needed
+                            updateMusicPlayerMetadata(p.spotify.track, p.spotify.artist);
                         } else {
-                            spotifySection.style.display = 'none';
-                            // Revert Music Player to Default
-                            if (window.updateMusicPlayerMetadata) {
-                                window.updateMusicPlayerMetadata('Futile Devices', 'Sufjan Stevens');
-                            }
+                            elements.spotifySection.style.display = 'none';
+                            updateMusicPlayerMetadata('Futile Devices', 'Sufjan Stevens');
                         }
 
-                        // Update Activity
-                        const activities = presence.activities.filter(a => a.type !== 2); // Filter out Spotify
-                        if (activities.length > 0) {
-                            const act = activities[0];
-                            activitySection.style.display = 'flex';
-                            activityName.textContent = act.name;
-                            activityDetail.textContent = act.details || act.state || 'Active now';
-                            
-                            // Activity Icon logic
-                            if (act.assets && act.assets.large_image) {
-                                const appId = act.application_id;
-                                const assetId = act.assets.large_image;
-                                const imageUrl = assetId.startsWith('mp:external') 
-                                    ? assetId.replace(/mp:external\/.*\/(https\/.*)/, 'https://$1')
-                                    : `https://cdn.discordapp.com/app-assets/${appId}/${assetId}.png`;
-                                activityIcon.innerHTML = `<img src="${imageUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
+                        // Game Activity
+                        const games = p.activities.filter(a => a.type !== 2);
+                        if(games.length > 0) {
+                            const g = games[0];
+                            elements.activitySection.style.display = 'flex';
+                            elements.activityName.textContent = g.name;
+                            elements.activityDetail.textContent = g.details || g.state || 'Active now';
+                            if(g.assets && g.assets.large_image) {
+                                const appId = g.application_id;
+                                const imgId = g.assets.large_image;
+                                const url = imgId.startsWith('mp:external') ? imgId.replace(/mp:external\/.*\/(https\/.*)/, 'https://$1') : `https://cdn.discordapp.com/app-assets/${appId}/${imgId}.png`;
+                                elements.activityIcon.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
                             } else {
-                                activityIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="color: var(--accent-primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>`;
+                                elements.activityIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="color: var(--accent-primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>`;
                             }
                         } else {
-                            activitySection.style.display = 'none';
+                            elements.activitySection.style.display = 'none';
                         }
-                    })
-                    .catch(err => console.error('Lanyard Error:', err));
+                    }).catch(e => console.error('Lanyard Error:', e));
             }
+            update(); setInterval(update, 10000);
+        }
 
-            // Initial and interval update
-            updatePresence();
-            setInterval(updatePresence, 10000); // Update every 10 seconds
-        })();
+        // 6. Music Player
+        let isPlaying = false;
+        function initMusicPlayer() {
+            elements.bgMusic.volume = elements.volumeSlider.value / 100;
 
-        /* ============================================ */
-        /*  MUSIC PLAYER                                */
-        /* ============================================ */
-        (function initMusicPlayer() {
-            const audio = document.getElementById('bgMusic');
-            const toggle = document.getElementById('musicToggle');
-            const playIcon = document.getElementById('playIcon');
-            const pauseIcon = document.getElementById('pauseIcon');
-            const volumeSlider = document.getElementById('volumeSlider');
-            const titleEl = document.querySelector('.music-title');
-            const labelEl = document.querySelector('.music-artist-label');
-            const overlay = document.getElementById('audio-overlay');
-
-            audio.volume = 0.3;
-            let isPlaying = false;
-
-            overlay.addEventListener('click', () => {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    playIcon.style.display = 'none';
-                    pauseIcon.style.display = 'block';
-                    labelEl.textContent = 'Now playing';
-                    overlay.style.opacity = '0';
-                    setTimeout(() => overlay.remove(), 500);
-                }).catch(err => {
-                    console.error("Audio play failed:", err);
-                    overlay.remove(); // Remove anyway if it fails
-                });
-            });
-
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isPlaying) {
-                    audio.pause();
-                    playIcon.style.display = 'block';
-                    pauseIcon.style.display = 'none';
-                    labelEl.textContent = 'Paused';
+            elements.musicToggle.addEventListener('click', () => {
+                if(isPlaying) {
+                    elements.bgMusic.pause();
                 } else {
-                    audio.play().catch(() => {});
-                    playIcon.style.display = 'none';
-                    pauseIcon.style.display = 'block';
-                    labelEl.textContent = 'Now playing';
+                    elements.bgMusic.play().catch(()=>{});
                 }
                 isPlaying = !isPlaying;
+                updateMusicUI();
             });
 
-            volumeSlider.addEventListener('input', e => {
-                audio.volume = e.target.value / 100;
+            elements.volumeSlider.addEventListener('input', (e) => {
+                elements.bgMusic.volume = e.target.value / 100;
             });
+        }
 
-            // Spotify Sync for Music Player Metadata
-            window.updateMusicPlayerMetadata = (track, artist) => {
-                titleEl.textContent = track || 'Futile Devices';
-                labelEl.textContent = artist ? `by ${artist}` : 'Now playing';
-            };
-        })();
+        function updateMusicUI() {
+            elements.playIcon.style.display = isPlaying ? 'none' : 'block';
+            elements.pauseIcon.style.display = isPlaying ? 'block' : 'none';
+            elements.musicArtistLabel.textContent = isPlaying ? 'Now playing' : 'Paused';
+        }
 
-        /* ============================================ */
-        /*  VISITOR COUNT (localStorage sim)            */
-        /* ============================================ */
-        /* Visitor count — views badge only */
-        (function initVisitors() {
+        function updateMusicPlayerMetadata(title, artist) {
+            elements.musicTitle.textContent = title;
+            elements.musicArtistLabel.textContent = `by ${artist}`;
+        }
+
+        // 7. Visitor Counter
+        function initVisitorCounter() {
             let count = parseInt(localStorage.getItem('ext000_views') || '1247');
             count++;
             localStorage.setItem('ext000_views', count);
-
-            const formatted = count >= 1000
-                ? (count / 1000).toFixed(1) + 'k'
-                : count.toString();
-
-            document.getElementById('viewCount').textContent = formatted.replace(/\.0k/, 'k');
-        })();
-
-        /* ============================================ */
-        /*  CARD TILT EFFECT                            */
-        /* ============================================ */
-        (function initTilt() {
             const card = document.getElementById('mainCard');
 
             card.addEventListener('mousemove', e => {

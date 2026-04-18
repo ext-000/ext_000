@@ -1,0 +1,4 @@
+main_dev.html
+*.log
+node_modules/
+.DS_Store

@@ -4321,7 +4321,7 @@ LPH_JIT_MAX(function()
             rawset(self, index, value)
         end
     }))
-    local pathfinding = loadstring(game:HttpGet("https://raw.githubusercontent.com/iRay888/wapus/refs/heads/main/pathfinding.lua"))()
+    local pathfinding = loadstring(game:HttpGet("https://raw.githubusercontent.com/iRay888/camelo/refs/heads/main/pathfinding.lua"))()
     local physicsignore = {workspace.Terrain, ignore, workspace.Players, camera}
     local raycastparameters = RaycastParams.new()
     local function raycast(origin, direction, filterlist, whitelist)
@@ -4648,7 +4648,7 @@ LPH_JIT_MAX(function()
                     currentObj:setSprint(sprinting)
                 elseif name == "stance" then
                     local stance = ...
-                    if (not camelo:GetValue("Anti Aim", "Enabled (May Cause Despawning)") or not camelo:GetValue("Anti Aim", "Force Stance") or not camelo:GetValue("Third Person", "Apply Anti Aim To Character")) and currentObj then
+                    if (not camelo:GetValue("Anti Aim", "Enabled (May Cause Despawning)") or not camelo:GetValue("Anti Aim", "Force Stance")) and currentObj then
                         currentObj:setStance(stance)
                     end
                 elseif name == "newbullets" then
@@ -4850,7 +4850,7 @@ LPH_JIT_MAX(function()
             if name == "stance" and camelo:GetValue("Anti Aim", "Force Stance") then
                 local stance = ...
                 stance = string.lower(camelo:GetValue("Anti Aim", "Set Stance"))
-                if camelo:GetValue("Third Person", "Apply Anti Aim To Character") and currentObj then
+                if currentObj then
                     currentObj:setStance(stance)
                 end
                 return send(self, name, stance)
@@ -4894,7 +4894,7 @@ LPH_JIT_MAX(function()
             if controller and (camelo:GetValue("Third Person", "Show Character While Aiming") or not controller:getActiveWeapon()._aiming) then
                 local cameraOffset = Vector3.new(camelo:GetValue("Third Person", "Camera Offset X"), camelo:GetValue("Third Person", "Camera Offset Y"), camelo:GetValue("Third Person", "Camera Offset Z"))
                 local didHit = false
-                if camelo:GetValue("Third Person", "Camera Offset Always Visible") then
+                if true then -- Always prevent camera clipping
                     local oldPosition = camera.CFrame.Position
                     local newPosition = camera.CFrame * cameraOffset
                     local dir = newPosition - oldPosition
@@ -5297,7 +5297,7 @@ LPH_JIT_MAX(function()
     callbackList["Anti Aim%%Enabled (May Cause Despawning)"] = function(state)
         callbackList["Anti Aim%%Spin Bot"]()
         if charInterface.isAlive() then
-            if camelo:GetValue("Third Person", "Show Character") and camelo:GetValue("Third Person", "Apply Anti Aim To Character") and currentObj then
+            if camelo:GetValue("Third Person", "Show Character") and currentObj then
                 if camelo:GetValue("Anti Aim", "Force Stance") then
                     local stance = state and camelo:GetValue("Anti Aim", "Set Stance") or newSpawnCache.stance or "stand"
                     currentObj:setStance(stance)
@@ -5768,7 +5768,7 @@ LPH_NO_VIRTUALIZE(function()
             "but diagnosis: OWND"
         }))
     end
-    local menu = Library:New({ Name = "camelo" }); camelo = menu
+    local menu = Library:New({ Name = "camelo" })
     local function getCallback(flag)
         return function(val)
             if callbackList[flag] then
@@ -5799,14 +5799,14 @@ LPH_NO_VIRTUALIZE(function()
     local visuals = menu:AddTab("Visuals")
     local misc = menu:AddTab("Misc")
     local settings = menu:AddTab("Settings")
-    local aimbot = aiming:AddSection("Aim Bot", "Left")
-    local fovsettings = aiming:AddSection("FOV Settings", "Left")
-    local silentaim = aiming:AddSection("Silent Aim", "Right")
-    local gunmods = aiming:AddSection("Gun Mods", "Right")
-    local worldvisuals = visuals:AddSection("World Visuals", "Right")
-    local thirdperson = visuals:AddSection("Third Person", "Left")
-    local movement = misc:AddSection("Movement", "Left")
-    local sounds = misc:AddSection("Sounds", "Left")
+    local aimbot = aiming:AddSection("Assistance", "Left")
+    local fovsettings = aiming:AddSection("View Configuration", "Left")
+    local silentaim = aiming:AddSection("Targeting", "Right")
+    local gunmods = aiming:AddSection("Weaponry", "Right")
+    local worldvisuals = visuals:AddSection("Environment", "Right")
+    local thirdperson = visuals:AddSection("Perspective", "Left")
+    local movement = misc:AddSection("Locomotion", "Left")
+    local sounds = misc:AddSection("Audio", "Left")
     aimbot:AddToggle({ Name = "Enabled", Default = false, Callback = getCallback("Aim Bot%%Enabled"), SaveAs = "Aim Bot%%Enabled" }):AddKeybind({ Name = "Key Bind" })
     aimbot:AddToggle({ Name = "Visible Check", Default = false, Callback = getCallback("Aim Bot%%Visible Check"), SaveAs = "Aim Bot%%Visible Check" })
     aimbot:AddSlider({ Name = "Smoothness", Min = 0, Max = 0.99, Default = 0, Precision = 0.01, Suffix = "x", Callback = getCallback("Aim Bot%%Smoothness"), SaveAs = "Aim Bot%%Smoothness" })
@@ -5854,8 +5854,6 @@ LPH_NO_VIRTUALIZE(function()
     thirdperson:AddSlider({ Name = "Camera Offset X", Min = -20, Max = 20, Default = 0, Precision = 1, Suffix = " Studs", Callback = getCallback("Third Person%%Camera Offset X"), SaveAs = "Third Person%%Camera Offset X" })
     thirdperson:AddSlider({ Name = "Camera Offset Y", Min = -20, Max = 20, Default = 0, Precision = 1, Suffix = " Studs", Callback = getCallback("Third Person%%Camera Offset Y"), SaveAs = "Third Person%%Camera Offset Y" })
     thirdperson:AddSlider({ Name = "Camera Offset Z", Min = -20, Max = 20, Default = 7, Precision = 1, Suffix = " Studs", Callback = getCallback("Third Person%%Camera Offset Z"), SaveAs = "Third Person%%Camera Offset Z" })
-    thirdperson:AddToggle({ Name = "Camera Offset Always Visible", Default = true, Callback = getCallback("Third Person%%Camera Offset Always Visible"), SaveAs = "Third Person%%Camera Offset Always Visible" })
-    thirdperson:AddToggle({ Name = "Apply Anti Aim To Character", Default = true, Callback = getCallback("Third Person%%Apply Anti Aim To Character"), SaveAs = "Third Person%%Apply Anti Aim To Character" })
     movement:AddToggle({ Name = "Walk Speed", Default = false, Callback = getCallback("Movement%%Walk Speed"), SaveAs = "Movement%%Walk Speed" }):AddKeybind({ Name = "Walk Bind" })
     movement:AddSlider({ Name = "Set Speed", Min = 10, Max = 250, Default = 50, Precision = 1, Suffix = " Studs/Second", Callback = getCallback("Movement%%Set Speed"), SaveAs = "Movement%%Set Speed" })
     movement:AddToggle({ Name = "No Fall Damage", Default = false, Callback = getCallback("Movement%%No Fall Damage"), SaveAs = "Movement%%No Fall Damage" })
